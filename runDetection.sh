@@ -8,4 +8,5 @@ DATE=$(echo $VIDEO | cut -d-  -f2 | cut -d. -f1-2)
 
 OUTPATH=/mnt/analysis/$CAMERA/$DATE
 
+echo "Running detection on $CAMERA/$DATE frames"
 find $OUTPATH -name "*.jpg" -exec python3 cv_detect.py {} \;

@@ -19,13 +19,26 @@ video=/mnt/video//mnt/video/camera1-20200921T091843.1600705123.h264
 
 # Ingest Metadata to Google Cloud
 
-You'll need to install the [ Firebase SDK ](ttps://firebase.google.com/docs/firestore/quickstart) for this part.
+You'll need to install the [ Firebase SDK ](https://firebase.google.com/docs/firestore/quickstart) for this part.
 
 ```
 video=/mnt/video//mnt/video/camera1-20200921T091843.1600705123.h264
 
 ./runIngestion.sh
 ```
+
+# Running the UI
+
+## Prerequisite
+
+You'll need firebase credentials for the project.
+
+```
+npm install
+npm start
+```
+
+Open a browser to http://localhost:1234
 
 # Plans
 
