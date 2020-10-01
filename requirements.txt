@@ -1,0 +1,5 @@
+scikit-build
+cmake
+opencv-python
+cvlib
+mxnet
