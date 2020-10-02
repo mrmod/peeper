@@ -40,6 +40,12 @@ npm start
 
 Open a browser to http://localhost:1234
 
+## Example
+
+Chairs of the migratory variety...
+
+![example](image.png)
+
 # Plans
 
 * Find events where there's no car in the driveway
