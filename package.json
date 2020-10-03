@@ -5,7 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel index.html"
+    "start": "parcel index.html",
+    "clean": "rm -rf public/*",
+    "build": "parcel build --out-dir public index.js src/*.js src/**/*.js",
+    "package": "cp index.html public/",
+    "preview": "docker run --rm --name pi-garage-cam -p 8081:80 -v $(pwd)/public:/usr/share/nginx/html nginx",
+    "deploy": "firebase deploy"
   },
   "author": "",
   "license": "ISC",

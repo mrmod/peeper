@@ -8,6 +8,20 @@ Converts a captured H.264 video into a series of JPEG frames. Objects can then b
 * Mount H.264 videos dataset to `/mnt/video`
 * Mount an output path for analyzed videos to `/mnt/analysis`
 
+## Troubles
+
+### PIP: Firebase-Admin SegFault
+
+Upgrade pip: `pip install --upgrade pip`
+
+### TensorFlow: Core Dump
+
+Verify CPU has AVX extensions: `cat /proc/cpuinfo` or whatever is right for windows.
+
+You might be compiling on your own! https://www.tensorflow.org/install/source
+
+Set aside about 24 hours for the compilation to complete.
+
 # Using the Local Pipeline
 
 ```
@@ -45,6 +59,20 @@ Open a browser to http://localhost:1234
 Chairs of the migratory variety...
 
 ![example](image.png)
+## Building for Public Release (Production)
+
+```
+# Compile and minify JS to public/
+npm run build
+# Copy index.html to public/
+npm run package
+# Run a server to preview the compiled site (required docker)
+npm run preview # http://localhost:8081 has compiled site
+# Deploy to Firebase Hosting
+npm run deploy
+```
+
+Optionally, clean-up cruft in `public/` with `npm run clean`.
 
 # Plans
 

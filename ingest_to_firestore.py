@@ -50,5 +50,6 @@ def show_documents():
 
 
 if __name__ == "__main__":
+    print(f"Ingesting {sys.argv[1]}")
     create_document(sys.argv[1])
     # show_documents()
