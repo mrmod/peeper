@@ -4,3 +4,4 @@ opencv-python
 cvlib
 mxnet
 tensorflow
+firebase-admin
