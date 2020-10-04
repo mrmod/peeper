@@ -3,18 +3,21 @@ import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import firebase from 'firebase/app'
 import 'firebase/firestore'
+import 'firebase/storage'
 
 import * as config from './firebaseConfig'
-import { Button, Card, CardContent, CardHeader, Grid, LinearProgress, TextField, Typography } from '@material-ui/core'
+import { Button, Card, CardActionArea, CardContent, CardHeader, CardMedia, Grid, LinearProgress, TextField, Typography } from '@material-ui/core'
 import { Area, AreaChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 
 firebase.initializeApp({
     apiKey: config.apiKey,
     authDomain: config.authDomain,
     projectId: config.projectId,
+    storageBucket: config.storageBucket,
 })
 
 const firestore = firebase.firestore()
+const storage = firebase.storage()
 const COLLECTION = "detections"
 
 const DOCUMENT_SHAPE = {
@@ -53,21 +56,76 @@ const DOCUMENT_SHAPE = {
 
 }
 
+const imageBucketPath = (document) => {
+    return `${document.camera}/${document.eventDate}/${document.frame}.jpg`
+}
+
+const getBucketImage = (imagePath) => {
+    const pathRef = storage.refFromURL(
+        `gs://${config.storageBucket}/${imagePath}`
+    )
+    return storage.ref("/").child(imagePath).getDownloadURL()
+    .then((url) => {
+        return url
+    })
+    .catch(err => {
+        console.warn(`Unable to create ref for ${imagePath}`)
+        return null
+    })
+}
+
+const getDocumentSample = (documents) => documents[Math.floor(Math.random() * documents.length)]
+const getDocumentImage = (document) => {
+    return getBucketImage(imageBucketPath(document))
+}
+
+const sampleId = doc => `${doc.camera}/${doc.eventDate}/${doc.frame}.jpg`
+/**
+ * Container for chart plotting label confidence
+ * @param {*} props 
+ */
 const LabelCard = (props) => {
+    const [documentSample, setDocumentSample] = React.useState(null)
+    const [imageSample, setImageSample] = React.useState(null)
+    const [showImageSample, setShowImageSample] = React.useState(false)
     
+    React.useEffect(() => {
+        if (documentSample) {
+            return
+        }
+        const document = getDocumentSample(props.documents)
+        setDocumentSample(document)
+        getDocumentImage(document)
+            .then(imageUrl => setImageSample(imageUrl))
+    },[props.documents])
+
     return <Card style={{margin: "2px"}} variant="outlined" square={true}>
         <CardHeader
             title={`Label: ${props.label}`}
-            subheader={`${props.documents.length} detections`} />
+            subheader={imageSample ? `Sample: ${sampleId(documentSample)}` : `${props.documents.length} detections`} />
+
         <CardContent>
             <Typography variant="h5">Label Confidence</Typography>
             <ResponsiveContainer width={400} height={400}>
                 <AreaChart data={props.documents}>
+                    <XAxis />
                     <YAxis dataKey="confidence" />
                     <Area type="monotone" dataKey="confidence" />
                 </AreaChart>
             </ResponsiveContainer>
+            { imageSample && showImageSample? <CardMedia
+                style={{height: "425px"}}
+                image={imageSample}
+                title="Representative sample" /> : null }
+                
         </CardContent>
+        <CardActionArea>
+            { imageSample ? <Button
+                onClick={() => setShowImageSample(!showImageSample)}
+                color={showImageSample ? 'secondary' : 'primary'}>
+                    {showImageSample ? 'Hide' : 'Show'} image sample
+                </Button> : null }
+        </CardActionArea>
     </Card>
 }
 
@@ -100,12 +158,15 @@ LabelCards.propTypes = {
     })
 }
 
+/**
+ * DataViewer
+ * 
+ * Container for plots of label confidence scores for video frames
+ */
 const DataViewer = () => {
 
     const [loading, setLoading] = React.useState(false)
     const [labels, setLabels] = React.useState({})
-    const [showImagePaths, setShowImagePaths] = React.useState(false)
-
 
     React.useEffect(() => {
         setLoading(true)
@@ -155,14 +216,6 @@ const DataViewer = () => {
     } else {
         return <div style={{display: "flex", flexWrap: "wrap"}}>
             <LabelCards labels={labels} />
-            <Button
-                fullWidth={true}
-                onClick={() => setShowImagePaths(!showImagePaths)}
-                color={showImagePaths ? "secondary" : "primary"}
-                variant="outlined">
-                    {showImagePaths ? 'Hide' : 'Show'} local image paths
-                </Button>
-            {showImagePaths ? dumpImagePaths(labels) : null }
         </div>
     }
 }
