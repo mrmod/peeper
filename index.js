@@ -63,6 +63,7 @@ const LabelCard = (props) => {
             <Typography variant="h5">Label Confidence</Typography>
             <ResponsiveContainer width={400} height={400}>
                 <AreaChart data={props.documents}>
+                    <YAxis dataKey="confidence" />
                     <Area type="monotone" dataKey="confidence" />
                 </AreaChart>
             </ResponsiveContainer>
@@ -105,8 +106,6 @@ const DataViewer = () => {
     const [labels, setLabels] = React.useState({})
     const [showImagePaths, setShowImagePaths] = React.useState(false)
 
-    const [docsLoaded, setDocsLoaded] = React.useState(0)
-    const [totalDocs, setTotalDocs] = React.useState(1)
 
     React.useEffect(() => {
         setLoading(true)
@@ -114,7 +113,6 @@ const DataViewer = () => {
             .then(result => {
                 const documentCollection = []
                 result.forEach(doc => documentCollection.push(doc.data()))
-                setTotalDocs(documentCollection.length)
                 return documentCollection
             })
             .then(docs => {
@@ -134,8 +132,6 @@ const DataViewer = () => {
             } else {
                 _labels[doc.label] = [doc]
             }
-            // Might be too quick to capture
-            setDocsLoaded(docsLoaded+1)
         })
         setLabels(_labels)
     }
@@ -155,9 +151,7 @@ const DataViewer = () => {
     }
 
     if (loading) {
-        return <LinearProgress
-            variant="determinate"
-            value={100 * (docsLoaded / totalDocs )} />
+        return <LinearProgress />
     } else {
         return <div style={{display: "flex", flexWrap: "wrap"}}>
             <LabelCards labels={labels} />
