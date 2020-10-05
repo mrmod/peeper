@@ -21,8 +21,9 @@ def upload_image(image_path):
 
     blob = bucket.blob(bucket_file)
 
-    print(f"Uploading {image_path}")
-    blob.upload_from_filename(image_path)
+    if not blob.exists():
+        print(f"Uploading {image_path}")
+        blob.upload_from_filename(image_path)
 
 
 if __name__ == "__main__":
