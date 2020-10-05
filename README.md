@@ -29,6 +29,10 @@ video=/mnt/video//mnt/video/camera1-20200921T091843.1600705123.h264
 
 ./getFrames.sh $video
 ./runDetection.sh $video
+./runIngestion $video
+
+# Upload images if they are not already uploaded
+./runUploadImages.sh /mnt/analysis/camera1/
 ```
 
 # Ingest Metadata to Google Cloud
